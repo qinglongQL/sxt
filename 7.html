@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>彩灯动画</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .light {
+        @apply w-12 h-12 rounded-full transition-all duration-300 shadow-lg transform hover:scale-110;
+      }
+      .btn {
+        @apply px-6 py-3 rounded-lg font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1;
+      }
+      .btn-primary {
+        @apply bg-primary hover:bg-primary/90;
+      }
+      .btn-secondary {
+        @apply bg-secondary hover:bg-secondary/90;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-3xl">
+    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-8 text-center">七彩霓虹灯</h1>
+    
+    <div id="light-container" class="flex flex-wrap justify-center gap-4 md:gap-8 mb-10">
+      <div class="light" id="light1"></div>
+      <div class="light" id="light2"></div>
+      <div class="light" id="light3"></div>
+      <div class="light" id="light4"></div>
+      <div class="light" id="light5"></div>
+      <div class="light" id="light6"></div>
+      <div class="light" id="light7"></div>
+    </div>
+    
+    <div class="flex flex-wrap justify-center gap-4">
+      <button id="startBtn" class="btn btn-primary">
+        <i class="fa fa-play mr-2"></i>启动
+      </button>
+      <button id="stopBtn" class="btn btn-secondary">
+        <i class="fa fa-stop mr-2"></i>停止
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const lights = document.querySelectorAll('.light');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const colors = ['#EF4444', '#F97316', '#FACC15', '#22C55E', '#3B82F6', '#8B5CF6', '#EC4899'];
+    let intervalId;
+    let isAnimating = false;
+    
+    function startAnimation() {
+      if (isAnimating) return;
+      
+      isAnimating = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      
+      startBtn.classList.add('opacity-70', 'cursor-not-allowed');
+      stopBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+      
+      let currentIndex = 0;
+      
+      intervalId = setInterval(() => {
+        lights.forEach((light, index) => {
+          const colorIndex = (currentIndex + index) % colors.length;
+          light.style.backgroundColor = colors[colorIndex];
+          light.style.boxShadow = `0 0 25px ${colors[colorIndex]}`;
+        });
+        currentIndex = (currentIndex + 1) % colors.length;
+      }, 500);
+    }
+    
+    function stopAnimation() {
+      if (!isAnimating) return;
+      
+      isAnimating = false;
+      clearInterval(intervalId);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      
+      startBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+      stopBtn.classList.add('opacity-70', 'cursor-not-allowed');
+      
+      lights.forEach(light => {
+        light.style.backgroundColor = '#E5E7EB';
+        light.style.boxShadow = 'none';
+      });
+    }
+    
+    startBtn.addEventListener('click', startAnimation);
+    stopBtn.addEventListener('click', stopAnimation);
+    
+
+    stopAnimation();
+  </script>
+</body>
+</html>
+    
