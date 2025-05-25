@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机点名器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+            danger: '#EF4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .student-card {
+        @apply bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg cursor-pointer;
+      }
+      .selected {
+        @apply bg-primary/10 border-2 border-primary;
+      }
+      .btn {
+        @apply px-6 py-3 rounded-lg font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2;
+      }
+      .btn-primary {
+        @apply bg-primary hover:bg-primary/90 focus:ring-primary;
+      }
+      .btn-danger {
+        @apply bg-danger hover:bg-danger/90 focus:ring-danger;
+      }
+      .name-display {
+        @apply text-[clamp(2rem,5vw,3.5rem)] font-bold text-center transition-all duration-500;
+      }
+      .highlight {
+        @apply animate-pulse text-primary;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-4xl">
+    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-6 text-center">随机点名器</h1>
+    
+    <div class="mb-8">
+      <div id="selected-student" class="bg-gray-50 rounded-xl p-8 h-40 flex items-center justify-center mb-6">
+        <p id="name-display" class="name-display text-gray-500">点击开始按钮开始随机选择</p>
+      </div>
+      
+      <div class="flex justify-center gap-4">
+        <button id="startBtn" class="btn btn-primary">
+          <i class="fa fa-play mr-2"></i>开始
+        </button>
+        <button id="stopBtn" class="btn btn-danger opacity-50 cursor-not-allowed" disabled>
+          <i class="fa fa-stop mr-2"></i>停止
+        </button>
+      </div>
+    </div>
+    
+    <div class="border-t pt-6">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">学生名单</h2>
+      <div id="student-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <!-- 学生名单将通过JavaScript动态生成 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 示例学生名单
+    const students = [
+      '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'
+	  ,'19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35'
+    ];
+    
+    const studentList = document.getElementById('student-list');
+    const nameDisplay = document.getElementById('name-display');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    let intervalId;
+    let isSelecting = false;
+    
+    // 渲染学生名单
+    function renderStudentList() {
+      studentList.innerHTML = '';
+      students.forEach(student => {
+        const card = document.createElement('div');
+        card.className = 'student-card';
+        card.textContent = student;
+        card.dataset.name = student;
+        studentList.appendChild(card);
+      });
+    }
+    
+    // 随机选择学生
+    function selectRandomStudent() {
+      const randomIndex = Math.floor(Math.random() * students.length);
+      const selectedStudent = students[randomIndex];
+      
+      // 更新显示
+      nameDisplay.textContent = selectedStudent;
+      nameDisplay.classList.add('highlight');
+      
+      // 高亮当前选中的学生
+      document.querySelectorAll('.student-card').forEach(card => {
+        if (card.dataset.name === selectedStudent) {
+          card.classList.add('selected');
+        } else {
+          card.classList.remove('selected');
+        }
+      });
+    }
+    
+    // 开始随机选择
+    function startSelection() {
+      if (isSelecting) return;
+      
+      isSelecting = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      stopBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      
+      // 初始选择
+      selectRandomStudent();
+      
+      // 设置定时器，快速切换选中的学生
+      intervalId = setInterval(selectRandomStudent, 100);
+    }
+    
+    // 停止随机选择
+    function stopSelection() {
+      if (!isSelecting) return;
+      
+      isSelecting = false;
+      clearInterval(intervalId);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      
+      // 最终选中效果
+      nameDisplay.classList.add('scale-110');
+      setTimeout(() => {
+        nameDisplay.classList.remove('scale-110', 'highlight');
+      }, 500);
+    }
+    
+    // 添加事件监听器
+    startBtn.addEventListener('click', startSelection);
+    stopBtn.addEventListener('click', stopSelection);
+    
+    // 初始化
+    renderStudentList();
+  </script>
+</body>
+</html>
+    
